@@ -1,5 +1,10 @@
-// Placeholder sponsor units. Final banner creative is designed separately;
-// these lock in the slot positions and the enforced "Sponsored" labeling.
+// Sponsor units. Final banner creative is designed separately; these lock in the
+// slot positions and the enforced "Sponsored" labeling.
+
+// Default sponsor identities rendered on every record page. Record pages import
+// these so the two names stay in one place.
+export const REALTOR_SPONSOR = { initials: "OB", name: "Olga Blackburn, Realtor®" };
+export const LENDER_SPONSOR = { initials: "JB", name: "Jim Blackburn" };
 
 export function LeaderboardBanner({
   title, sub,

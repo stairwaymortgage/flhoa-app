@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { getCams } from "@/lib/data";
+import { getCamsSample } from "@/lib/data";
 import { Breadcrumbs, Badge } from "@/components/ui";
 import { SearchBox } from "@/components/SearchBox";
 
 export const metadata = { title: "Florida Licensed Community Association Managers (CAMs)" };
+export const revalidate = 3600;
 
-export default function CamIndex() {
-  const cams = getCams();
+export default async function CamIndex() {
+  const cams = await getCamsSample();
   return (
     <div className="mx-auto max-w-content px-6 pb-12">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Licensed Managers" }]} />

@@ -1,19 +1,21 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getAssociation, getAssociations, slug as slugify } from "@/lib/data";
+import { getAssociation, getAssociationParams, slug as slugify } from "@/lib/data";
 import { DELINQUENT_EXPLAINER, DATA_SOURCE, AS_OF_DATE } from "@/lib/status";
 import { PageGrid } from "@/components/PageGrid";
 import { HookBar } from "@/components/HookBar";
 import { Badge, Breadcrumbs, RecordShell, FactGrid, SubSection, SourceNote } from "@/components/ui";
-import { SidebarBox, SponsorCard, ClaimBox, SidebarLinks } from "@/components/Sponsors";
+import { SidebarBox, SponsorCard, ClaimBox, SidebarLinks, REALTOR_SPONSOR, LENDER_SPONSOR } from "@/components/Sponsors";
 
-export function generateStaticParams() {
-  return getAssociations().map((a) => ({ county: slugify(a.county), slug: a.slug }));
+export const dynamicParams = true;
+export const revalidate = 86400;
+
+export async function generateStaticParams() {
+  return getAssociationParams(1500);
 }
 
-export default function AssociationPage({ params }: { params: { county: string; slug: string } }) {
-  const a = getAssociation(params.county.replace(/-/g, " "), params.slug)
-    ?? getAssociations().find((x) => slugify(x.county) === params.county && x.slug === params.slug);
+export default async function AssociationPage({ params }: { params: { county: string; slug: string } }) {
+  const a = await getAssociation(params.county, params.slug);
   if (!a) notFound();
 
   const delinquent = a.secondaryStatus === "Delinquent";
@@ -95,10 +97,10 @@ export default function AssociationPage({ params }: { params: { county: string; 
         sidebar={
           <>
             <SidebarBox label="Featured Local Expert — Sponsored">
-              <SponsorCard initials="MR" name="Maria Rodriguez, Realtor®" tag={`${a.city} specialist`} />
+              <SponsorCard {...REALTOR_SPONSOR} tag={`${a.city} specialist`} />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard initials="$" name="Condo & Assessment Lending" tag="Purchase · Refi · HELOC · Foreign National" gold />
+              <SponsorCard {...LENDER_SPONSOR} tag="Purchase · Refi · HELOC · Foreign National" gold />
             </SidebarBox>
             <SidebarBox label={`In ${a.county} County`}>
               <SidebarLinks

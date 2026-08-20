@@ -1,24 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getAssociations, getAssociationsByCity, slug as slugify } from "@/lib/data";
+import { getAssociationsByCity } from "@/lib/data";
 import { Breadcrumbs, Badge } from "@/components/ui";
 import { LeaderboardBanner } from "@/components/Sponsors";
 
+export const dynamicParams = true;
+export const revalidate = 86400;
+
 export function generateStaticParams() {
-  const seen = new Set<string>();
-  const out: { county: string; city: string }[] = [];
-  for (const a of getAssociations()) {
-    const key = `${slugify(a.county)}|${a.citySlug}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      out.push({ county: slugify(a.county), city: a.citySlug });
-    }
-  }
-  return out;
+  // City hubs are rendered on demand and cached by ISR.
+  return [];
 }
 
-export default function CityHub({ params }: { params: { county: string; city: string } }) {
-  const list = getAssociationsByCity(params.county, params.city);
+export default async function CityHub({ params }: { params: { county: string; city: string } }) {
+  const list = await getAssociationsByCity(params.county, params.city);
   if (list.length === 0) notFound();
   const cityName = list[0].city;
   const countyName = list[0].county;

@@ -3,9 +3,10 @@ import { getCounties } from "@/lib/data";
 import { Breadcrumbs } from "@/components/ui";
 
 export const metadata = { title: "Florida Counties — Community Association Records" };
+export const revalidate = 3600;
 
-export default function CountiesIndex() {
-  const counties = getCounties();
+export default async function CountiesIndex() {
+  const counties = await getCounties();
   return (
     <div className="mx-auto max-w-content px-6 pb-12">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Counties" }]} />

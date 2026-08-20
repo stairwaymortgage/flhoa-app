@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { getDevelopers } from "@/lib/data";
+import { getDevelopersSample } from "@/lib/data";
 import { Breadcrumbs } from "@/components/ui";
 import { SearchBox } from "@/components/SearchBox";
 
 export const metadata = { title: "Florida Community Association Developers" };
+export const revalidate = 3600;
 
-export default function DevelopersIndex() {
-  const devs = getDevelopers();
+export default async function DevelopersIndex() {
+  const devs = await getDevelopersSample();
   return (
     <div className="mx-auto max-w-content px-6 pb-12">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Developers" }]} />

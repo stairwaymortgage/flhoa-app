@@ -1,18 +1,21 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getFirm, getFirms, slug as slugify } from "@/lib/data";
+import { getFirm, getFirmParams, slug as slugify } from "@/lib/data";
 import { isFirmActive } from "@/lib/status";
 import { PageGrid } from "@/components/PageGrid";
 import { HookBar } from "@/components/HookBar";
 import { Badge, Breadcrumbs, RecordShell, FactGrid, SubSection, SourceNote } from "@/components/ui";
-import { LeaderboardBanner, InlineBanner, SidebarBox, SponsorCard, ClaimBox, SidebarLinks } from "@/components/Sponsors";
+import { LeaderboardBanner, InlineBanner, SidebarBox, SponsorCard, ClaimBox, SidebarLinks, REALTOR_SPONSOR, LENDER_SPONSOR } from "@/components/Sponsors";
 
-export function generateStaticParams() {
-  return getFirms().map((f) => ({ slug: f.slug }));
+export const dynamicParams = true;
+export const revalidate = 86400;
+
+export async function generateStaticParams() {
+  return getFirmParams(1500);
 }
 
-export default function FirmPage({ params }: { params: { slug: string } }) {
-  const f = getFirm(params.slug);
+export default async function FirmPage({ params }: { params: { slug: string } }) {
+  const f = await getFirm(params.slug);
   if (!f) notFound();
   const active = isFirmActive(f.statusCode);
 
@@ -109,11 +112,11 @@ export default function FirmPage({ params }: { params: { slug: string } }) {
                 <b>Is this your company?</b> <a href="/claim" className="font-bold">Claim this profile</a> — add your logo, service areas & contact info. Featured placement available.
               </ClaimBox>
             </SidebarBox>
-            <SidebarBox label={`Featured Firm — ${f.county} County · Sponsored`}>
-              <SponsorCard initials="★" name="Premier Community Mgmt" tag="Accepting new associations" gold />
+            <SidebarBox label={`Featured Local Expert — ${f.county} County · Sponsored`}>
+              <SponsorCard {...REALTOR_SPONSOR} tag={`${f.county} County specialist`} />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard initials="$" name="Association & Owner Lending" tag="Repair loans · HELOC · Refi" />
+              <SponsorCard {...LENDER_SPONSOR} tag="Repair loans · HELOC · Refi" gold />
             </SidebarBox>
             <SidebarBox label="Related Records">
               <SidebarLinks

@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { getAssociations, slug as slugify } from "@/lib/data";
+import { getAssociationsSample, slug as slugify } from "@/lib/data";
 import { Breadcrumbs, Badge } from "@/components/ui";
 import { SearchBox } from "@/components/SearchBox";
 
 export const metadata = { title: "Florida Community Associations — Directory" };
+export const revalidate = 3600;
 
-export default function AssociationsIndex() {
-  const associations = getAssociations();
+export default async function AssociationsIndex() {
+  const associations = await getAssociationsSample();
   return (
     <div className="mx-auto max-w-content px-6 pb-12">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Associations" }]} />

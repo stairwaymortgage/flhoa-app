@@ -2,14 +2,16 @@ import Link from "next/link";
 import { SearchBox } from "@/components/SearchBox";
 import { TOTALS, getCounties } from "@/lib/data";
 
+export const revalidate = 3600;
+
 const FAMILIES = [
   { icon: "🏘️", title: "Associations", desc: "Who runs your community, its registration status, and its compliance record.", count: "37,159 pages", href: "/associations" },
   { icon: "🪪", title: "Managers", desc: "Verify any management firm or community association manager's license.", count: "55,892 pages", href: "/managers/firms" },
   { icon: "🏗️", title: "Developers", desc: "See every project a developer has filed with the state — their full portfolio.", count: "15,766 pages", href: "/developers" },
 ];
 
-export default function Home() {
-  const counties = getCounties();
+export default async function Home() {
+  const counties = await getCounties();
   return (
     <>
       <section className="bg-gradient-to-b from-navy to-navy-light text-white py-[52px] text-center">

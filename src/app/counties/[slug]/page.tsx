@@ -4,12 +4,16 @@ import { getCounty, getCounties } from "@/lib/data";
 import { Breadcrumbs } from "@/components/ui";
 import { LeaderboardBanner } from "@/components/Sponsors";
 
-export function generateStaticParams() {
-  return getCounties().map((c) => ({ slug: c.slug }));
+export const dynamicParams = true;
+export const revalidate = 86400;
+
+export async function generateStaticParams() {
+  const counties = await getCounties();
+  return counties.map((c) => ({ slug: c.slug }));
 }
 
-export default function CountyHub({ params }: { params: { slug: string } }) {
-  const c = getCounty(params.slug);
+export default async function CountyHub({ params }: { params: { slug: string } }) {
+  const c = await getCounty(params.slug);
   if (!c) notFound();
 
   return (

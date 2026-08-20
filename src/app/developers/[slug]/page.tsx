@@ -1,17 +1,20 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getDeveloper, getDevelopers, slug as slugify } from "@/lib/data";
+import { getDeveloper, getDeveloperParams } from "@/lib/data";
 import { PageGrid } from "@/components/PageGrid";
 import { HookBar } from "@/components/HookBar";
 import { Badge, Breadcrumbs, RecordShell, FactGrid, SubSection, SourceNote } from "@/components/ui";
-import { LeaderboardBanner, SidebarBox, SponsorCard, SidebarLinks } from "@/components/Sponsors";
+import { LeaderboardBanner, SidebarBox, SponsorCard, SidebarLinks, REALTOR_SPONSOR, LENDER_SPONSOR } from "@/components/Sponsors";
 
-export function generateStaticParams() {
-  return getDevelopers().map((d) => ({ slug: d.slug }));
+export const dynamicParams = true;
+export const revalidate = 86400;
+
+export async function generateStaticParams() {
+  return getDeveloperParams(1500);
 }
 
-export default function DeveloperPage({ params }: { params: { slug: string } }) {
-  const d = getDeveloper(params.slug);
+export default async function DeveloperPage({ params }: { params: { slug: string } }) {
+  const d = await getDeveloper(params.slug);
   if (!d) notFound();
 
   return (
@@ -89,11 +92,11 @@ export default function DeveloperPage({ params }: { params: { slug: string } }) 
         }
         sidebar={
           <>
-            <SidebarBox label="Featured Agent — New Construction · Sponsored">
-              <SponsorCard initials="JT" name="James Torres, Realtor®" tag="New-construction & resale specialist" />
+            <SidebarBox label="Featured Local Expert — New Construction · Sponsored">
+              <SponsorCard {...REALTOR_SPONSOR} tag="New-construction & resale specialist" />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard initials="$" name="New-Construction Lending" tag="Conventional · Jumbo · Foreign National" gold />
+              <SponsorCard {...LENDER_SPONSOR} tag="Conventional · Jumbo · Foreign National" gold />
             </SidebarBox>
             <SidebarBox label="Related Records">
               <SidebarLinks

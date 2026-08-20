@@ -1,17 +1,20 @@
 import { notFound } from "next/navigation";
-import { getCam, getCams } from "@/lib/data";
+import { getCam, getCamParams } from "@/lib/data";
 import { CAM_EXPLAINER, AS_OF_DATE } from "@/lib/status";
 import { PageGrid } from "@/components/PageGrid";
 import { HookBar } from "@/components/HookBar";
 import { Badge, Breadcrumbs, RecordShell, FactGrid, SubSection, SourceNote } from "@/components/ui";
-import { SidebarBox, SponsorCard, ClaimBox, SidebarLinks } from "@/components/Sponsors";
+import { SidebarBox, SponsorCard, ClaimBox, SidebarLinks, REALTOR_SPONSOR, LENDER_SPONSOR } from "@/components/Sponsors";
 
-export function generateStaticParams() {
-  return getCams().map((c) => ({ slug: c.slug }));
+export const dynamicParams = true;
+export const revalidate = 86400;
+
+export async function generateStaticParams() {
+  return getCamParams(1500);
 }
 
-export default function CamPage({ params }: { params: { slug: string } }) {
-  const c = getCam(params.slug);
+export default async function CamPage({ params }: { params: { slug: string } }) {
+  const c = await getCam(params.slug);
   if (!c) notFound();
 
   return (
@@ -72,11 +75,11 @@ export default function CamPage({ params }: { params: { slug: string } }) {
                 <b>Is this you?</b> <a href="/claim" className="font-bold">Claim this page</a> — add your firm, photo, and communities. Get renewal reminders before {c.expirationDate}.
               </ClaimBox>
             </SidebarBox>
-            <SidebarBox label="CE Provider — Sponsored">
-              <SponsorCard initials="CE" name="Florida CAM Courses Online" tag="State-approved continuing education" />
+            <SidebarBox label="Featured Local Expert — Sponsored">
+              <SponsorCard {...REALTOR_SPONSOR} tag={`${c.city} specialist`} />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard initials="$" name="Condo Lending" tag="Purchase · Refi · Foreign National" gold />
+              <SponsorCard {...LENDER_SPONSOR} tag="Purchase · Refi · Foreign National" gold />
             </SidebarBox>
             <SidebarBox label="Related Records">
               <SidebarLinks

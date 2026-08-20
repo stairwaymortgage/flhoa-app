@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { getFirms } from "@/lib/data";
+import { getFirmsSample } from "@/lib/data";
 import { Breadcrumbs, Badge } from "@/components/ui";
 import { SearchBox } from "@/components/SearchBox";
 
 export const metadata = { title: "Florida Community Association Management Firms" };
+export const revalidate = 3600;
 
-export default function FirmsIndex() {
-  const firms = getFirms();
+export default async function FirmsIndex() {
+  const firms = await getFirmsSample();
   return (
     <div className="mx-auto max-w-content px-6 pb-12">
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Management Firms" }]} />

@@ -148,6 +148,11 @@ export function SponsorCard({
             alt={name}
             width={72}
             height={72}
+            sizes="72px"
+            // Sidebar sponsor art is always below the fold: explicit dimensions
+            // reserve the box (no CLS) while the fetch stays lazy.
+            priority={false}
+            loading="lazy"
             className="w-[72px] h-[72px] rounded-lg object-cover shrink-0"
           />
         ) : (

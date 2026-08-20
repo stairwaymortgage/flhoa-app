@@ -1,9 +1,15 @@
+import { absoluteUrl } from "@/lib/site";
 import Link from "next/link";
 import { getCamsSample } from "@/lib/data";
 import { Breadcrumbs, Badge } from "@/components/ui";
 import { SearchBox } from "@/components/SearchBox";
 
-export const metadata = { title: "Florida Licensed Community Association Managers (CAMs)" };
+export const metadata = {
+  title: "Florida Licensed Community Association Managers (CAMs)",
+  description:
+    "Verify any of 23,293 licensed Florida Community Association Managers. License numbers, expiration dates, and continuing-education records from state public records.",
+  alternates: { canonical: absoluteUrl("/managers/cam") },
+};
 export const revalidate = 3600;
 
 export default async function CamIndex() {

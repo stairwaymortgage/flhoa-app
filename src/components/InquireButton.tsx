@@ -1,6 +1,7 @@
 "use client";
 
 import { useLeadModal, type LeadIntent, type LeadSponsor } from "./LeadModal";
+import { track } from "@/lib/analytics";
 
 // The "Inquire Now" control shared by every sponsor unit. Split out of
 // Sponsors.tsx so the sponsor components themselves stay server-rendered.
@@ -25,7 +26,10 @@ export function InquireButton({
   return (
     <button
       type="button"
-      onClick={() => openLead({ intent, sponsor, entityType, entityName, entitySlug })}
+      onClick={() => {
+        track("sponsor_click", { sponsor, intent, entityType, entityName });
+        openLead({ intent, sponsor, entityType, entityName, entitySlug });
+      }}
       className={className}
     >
       {label}

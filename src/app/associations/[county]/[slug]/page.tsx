@@ -14,10 +14,38 @@ import { HookBar } from "@/components/HookBar";
 import { Badge, Breadcrumbs, RecordShell, FactGrid, SubSection, SourceNote } from "@/components/ui";
 import { SidebarBox, SponsorCard, ClaimBox, SidebarLinks, REALTOR_SPONSOR, LENDER_SPONSOR } from "@/components/Sponsors";
 import { ComplianceSection } from "@/components/ComplianceSection";
+import { JsonLd, breadcrumbList, associationJsonLd } from "@/components/JsonLd";
+import { absoluteUrl } from "@/lib/site";
+import type { Metadata } from "next";
 import { correctionHref, claimHref } from "@/lib/corrections";
 
 export const dynamicParams = true;
 export const revalidate = 86400;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { county: string; slug: string };
+}): Promise<Metadata> {
+  const a = await getAssociation(params.county, params.slug);
+  if (!a) return { title: "Association Not Found" };
+  const path = `/associations/${params.county}/${params.slug}`;
+  const title = `${a.name} — ${a.city}, FL Community Association`;
+  const description = [
+    `${a.name} is a registered ${a.sourceType || "community association"} in ${a.city}, ${a.county} County, Florida`,
+    a.units ? ` with ${a.units} units` : "",
+    `. Registration status: ${a.primaryStatus}`,
+    a.secondaryStatus ? ` (secondary status: ${a.secondaryStatus})` : "",
+    ". Project number, managing entity, and filing facts from Florida DBPR public records.",
+  ].join("");
+  return {
+    title,
+    description,
+    alternates: { canonical: absoluteUrl(path) },
+    openGraph: { title, description, url: absoluteUrl(path), type: "profile" },
+    twitter: { card: "summary", title, description },
+  };
+}
 
 export async function generateStaticParams() {
   return getAssociationParams(1500);
@@ -39,6 +67,25 @@ export default async function AssociationPage({ params }: { params: { county: st
 
   return (
     <>
+      <JsonLd
+        data={associationJsonLd({
+          name: a.name,
+          street: a.street,
+          city: a.city,
+          state: a.state,
+          zip: a.zip,
+          url: pageUrl,
+          sourceType: a.sourceType,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbList([
+          { name: "Home", path: "/" },
+          { name: `${a.county} County`, path: `/counties/${params.county}` },
+          { name: a.city, path: `/associations/${params.county}/city/${a.citySlug}` },
+          { name: a.name, path: pageUrl },
+        ])}
+      />
       <div className="mx-auto max-w-content px-6">
         <Breadcrumbs
           items={[

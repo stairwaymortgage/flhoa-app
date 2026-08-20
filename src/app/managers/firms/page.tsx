@@ -1,9 +1,15 @@
+import { absoluteUrl } from "@/lib/site";
 import Link from "next/link";
 import { getFirmsSample } from "@/lib/data";
 import { Breadcrumbs, Badge } from "@/components/ui";
 import { SearchBox } from "@/components/SearchBox";
 
-export const metadata = { title: "Florida Community Association Management Firms" };
+export const metadata = {
+  title: "Florida Community Association Management Firms",
+  description:
+    "Verify any of 32,599 licensed Florida Community Association Business (CAB) management firms. License numbers, status, and expiration dates from state public records.",
+  alternates: { canonical: absoluteUrl("/managers/firms") },
+};
 export const revalidate = 3600;
 
 export default async function FirmsIndex() {

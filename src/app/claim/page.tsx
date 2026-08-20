@@ -6,6 +6,8 @@ export const metadata = {
   title: "Claim a Record — Florida HOA Registry",
   description:
     "Claim your association, management firm, licensed manager, or developer listing on the Florida HOA Registry.",
+  // Utility form: useful to visitors, nothing to index.
+  robots: { index: false, follow: true },
 };
 
 export default function ClaimPage() {

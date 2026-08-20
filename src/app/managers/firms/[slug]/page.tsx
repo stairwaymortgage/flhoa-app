@@ -3,6 +3,9 @@ import Link from "next/link";
 import { getFirm, getFirmParams, slug as slugify } from "@/lib/data";
 import { isFirmActive } from "@/lib/status";
 import { claimHref } from "@/lib/corrections";
+import { JsonLd, breadcrumbList, firmJsonLd } from "@/components/JsonLd";
+import { absoluteUrl } from "@/lib/site";
+import type { Metadata } from "next";
 import { PageGrid } from "@/components/PageGrid";
 import { HookBar } from "@/components/HookBar";
 import { Badge, Breadcrumbs, RecordShell, FactGrid, SubSection, SourceNote } from "@/components/ui";
@@ -10,6 +13,25 @@ import { LeaderboardBanner, InlineBanner, SidebarBox, SponsorCard, ClaimBox, Sid
 
 export const dynamicParams = true;
 export const revalidate = 86400;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const f = await getFirm(params.slug);
+  if (!f) return { title: "Firm Not Found" };
+  const path = `/managers/firms/${params.slug}`;
+  const title = `${f.name} — ${f.city}, FL Community Association Management Firm`;
+  const description = `${f.name} holds Florida Community Association Business license ${f.licenseNumber} (${f.statusPlain}) in ${f.city}, ${f.county} County. License dates and registry facts from Florida DBPR public records.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: absoluteUrl(path) },
+    openGraph: { title, description, url: absoluteUrl(path), type: "profile" },
+    twitter: { card: "summary", title, description },
+  };
+}
 
 export async function generateStaticParams() {
   return getFirmParams(1500);
@@ -22,6 +44,24 @@ export default async function FirmPage({ params }: { params: { slug: string } })
 
   return (
     <>
+      <JsonLd
+        data={firmJsonLd({
+          name: f.name,
+          street: f.street,
+          city: f.city,
+          state: f.state,
+          zip: f.zip,
+          url: `/managers/firms/${f.slug}`,
+          licenseNumber: f.licenseNumber,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbList([
+          { name: "Home", path: "/" },
+          { name: "Management Firms", path: "/managers/firms" },
+          { name: f.name, path: `/managers/firms/${f.slug}` },
+        ])}
+      />
       <div className="mx-auto max-w-content px-6">
         <Breadcrumbs
           items={[

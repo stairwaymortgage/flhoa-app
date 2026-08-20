@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { submitCorrection } from "@/lib/data";
+import { track } from "@/lib/analytics";
 
 const ENTITY_LABELS: Record<string, string> = {
   association: "Association",
@@ -37,6 +38,7 @@ export function CorrectionForm() {
         message: message.trim(),
         submitterEmail: email.trim() || null,
       });
+      track("correction_submit", { entityType: entityType ?? undefined });
       setState("sent");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Submission failed.");

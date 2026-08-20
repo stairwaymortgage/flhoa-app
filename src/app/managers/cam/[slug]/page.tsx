@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { getCam, getCamParams } from "@/lib/data";
 import { CAM_EXPLAINER, AS_OF_DATE } from "@/lib/status";
 import { claimHref } from "@/lib/corrections";
+import { JsonLd, breadcrumbList, camJsonLd } from "@/components/JsonLd";
+import { absoluteUrl } from "@/lib/site";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PageGrid } from "@/components/PageGrid";
 import { HookBar } from "@/components/HookBar";
@@ -10,6 +13,25 @@ import { SidebarBox, SponsorCard, ClaimBox, SidebarLinks, REALTOR_SPONSOR, LENDE
 
 export const dynamicParams = true;
 export const revalidate = 86400;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const c = await getCam(params.slug);
+  if (!c) return { title: "Manager Not Found" };
+  const path = `/managers/cam/${params.slug}`;
+  const title = `${c.name}, CAM — Florida Licensed Community Association Manager`;
+  const description = `${c.name} holds Florida CAM license ${c.licenseNumber}${c.city ? ` in ${c.city}` : ""}${c.expirationDate ? `, expiring ${c.expirationDate}` : ""}. License and continuing-education facts from Florida DBPR public records.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: absoluteUrl(path) },
+    openGraph: { title, description, url: absoluteUrl(path), type: "profile" },
+    twitter: { card: "summary", title, description },
+  };
+}
 
 export async function generateStaticParams() {
   return getCamParams(1500);
@@ -21,6 +43,21 @@ export default async function CamPage({ params }: { params: { slug: string } }) 
 
   return (
     <>
+      <JsonLd
+        data={camJsonLd({
+          name: c.name,
+          city: c.city,
+          url: `/managers/cam/${c.slug}`,
+          licenseNumber: c.licenseNumber,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbList([
+          { name: "Home", path: "/" },
+          { name: "Licensed Managers", path: "/managers/cam" },
+          { name: c.name, path: `/managers/cam/${c.slug}` },
+        ])}
+      />
       <div className="mx-auto max-w-content px-6">
         <Breadcrumbs
           items={[

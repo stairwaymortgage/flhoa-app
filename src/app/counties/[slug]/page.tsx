@@ -3,9 +3,31 @@ import { notFound } from "next/navigation";
 import { getCounty, getCounties } from "@/lib/data";
 import { Breadcrumbs } from "@/components/ui";
 import { LeaderboardBanner } from "@/components/Sponsors";
+import { JsonLd, breadcrumbList } from "@/components/JsonLd";
+import { absoluteUrl } from "@/lib/site";
+import type { Metadata } from "next";
 
 export const dynamicParams = true;
 export const revalidate = 86400;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const c = await getCounty(params.slug);
+  if (!c) return { title: "County Not Found" };
+  const path = `/counties/${params.slug}`;
+  const title = `${c.name} County Community Associations & Managers`;
+  const description = `${c.associationCount.toLocaleString()} registered community associations and ${c.firmCount.toLocaleString()} managing entities on file in ${c.name} County, Florida. Browse every city and verify a record against state public records.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: absoluteUrl(path) },
+    openGraph: { title, description, url: absoluteUrl(path) },
+    twitter: { card: "summary", title, description },
+  };
+}
 
 export async function generateStaticParams() {
   const counties = await getCounties();
@@ -18,6 +40,13 @@ export default async function CountyHub({ params }: { params: { slug: string } }
 
   return (
     <div className="mx-auto max-w-content px-6 pb-12">
+      <JsonLd
+        data={breadcrumbList([
+          { name: "Home", path: "/" },
+          { name: "Counties", path: "/counties" },
+          { name: `${c.name} County`, path: `/counties/${c.slug}` },
+        ])}
+      />
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },

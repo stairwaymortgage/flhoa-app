@@ -1,7 +1,13 @@
+import { absoluteUrl } from "@/lib/site";
 import { Breadcrumbs } from "@/components/ui";
 import { SearchBox } from "@/components/SearchBox";
 
-export const metadata = { title: "Verify a Florida CAM or Management Firm License" };
+export const metadata = {
+  title: "Verify a Florida CAM or Management Firm License",
+  description:
+    "Check whether a Florida community association manager or management firm holds a current state license. Search by name against official DBPR license records.",
+  alternates: { canonical: absoluteUrl("/verify") },
+};
 
 export default function VerifyPage() {
   return (

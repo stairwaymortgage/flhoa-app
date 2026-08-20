@@ -1,8 +1,14 @@
+import { absoluteUrl } from "@/lib/site";
 import Link from "next/link";
 import { getCounties } from "@/lib/data";
 import { Breadcrumbs } from "@/components/ui";
 
-export const metadata = { title: "Florida Counties — Community Association Records" };
+export const metadata = {
+  title: "Florida Counties — Community Association Records",
+  description:
+    "Community association public records across every Florida county. Browse associations, management firms, and developers by county and city.",
+  alternates: { canonical: absoluteUrl("/counties") },
+};
 export const revalidate = 3600;
 
 export default async function CountiesIndex() {

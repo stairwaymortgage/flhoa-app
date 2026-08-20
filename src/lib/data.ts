@@ -172,6 +172,21 @@ export async function getAssociationsByCity(
   return (data ?? []).map(mapAssociation);
 }
 
+// The registry-wide count for a city. getAssociationsByCity caps its result at
+// 500 rows, so this is the number to quote rather than the returned list length.
+export async function getCityAssociationCount(
+  countySlug: string,
+  citySlug: string
+): Promise<number | null> {
+  const { data } = await supabase
+    .from("cities")
+    .select("association_count")
+    .eq("county_slug", countySlug)
+    .eq("slug", citySlug)
+    .maybeSingle();
+  return data?.association_count ?? null;
+}
+
 export async function getAssociationsSample(limit = 60): Promise<Association[]> {
   const { data } = await supabase
     .from("associations")

@@ -7,6 +7,8 @@ export const metadata = {
   title: "Request a Correction — Florida HOA Registry",
   description:
     "Report an error in a Florida community association, management firm, licensed manager, or developer record.",
+  // Utility form: useful to visitors, nothing to index.
+  robots: { index: false, follow: true },
 };
 
 export default function CorrectionsPage() {

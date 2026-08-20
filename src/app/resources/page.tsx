@@ -2,11 +2,13 @@ import Link from "next/link";
 import { getGovContacts } from "@/lib/data";
 import { Breadcrumbs } from "@/components/ui";
 import { DATA_SOURCE, AS_OF_DATE } from "@/lib/status";
+import { absoluteUrl } from "@/lib/site";
 
 export const metadata = {
   title: "Florida Community Association Resources — Law, Records & Agencies",
   description:
     "Plain-English explainers of Florida Chapter 718, Chapter 720 and the SB 4-D milestone inspection law, owners' records-access rights, and state agency contacts.",
+  alternates: { canonical: absoluteUrl("/resources") },
 };
 export const revalidate = 86400;
 

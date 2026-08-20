@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { track } from "@/lib/analytics";
 
 const ROLES = [
   { value: "owner", label: "Owner in the community" },
@@ -51,6 +52,7 @@ export function ClaimForm() {
         message: message.trim() || null,
       });
       if (insertError) throw new Error(insertError.message);
+      track("claim_submit", { entityType: entityType ?? undefined, role });
       setState("sent");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Submission failed.");

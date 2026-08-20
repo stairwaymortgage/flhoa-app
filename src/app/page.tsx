@@ -1,8 +1,13 @@
+import { absoluteUrl } from "@/lib/site";
 import Link from "next/link";
 import { SearchBox } from "@/components/SearchBox";
 import { TOTALS, getCounties } from "@/lib/data";
 
 export const revalidate = 3600;
+
+export const metadata = {
+  alternates: { canonical: absoluteUrl("/") },
+};
 
 const FAMILIES = [
   { icon: "🏘️", title: "Associations", desc: "Who runs your community, its registration status, and its compliance record.", count: "37,159 pages", href: "/associations" },

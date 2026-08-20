@@ -2,12 +2,34 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getDeveloper, getDeveloperParams } from "@/lib/data";
 import { PageGrid } from "@/components/PageGrid";
+import { JsonLd, breadcrumbList, developerJsonLd } from "@/components/JsonLd";
+import { absoluteUrl } from "@/lib/site";
+import type { Metadata } from "next";
 import { HookBar } from "@/components/HookBar";
 import { Badge, Breadcrumbs, RecordShell, FactGrid, SubSection, SourceNote } from "@/components/ui";
 import { LeaderboardBanner, SidebarBox, SponsorCard, SidebarLinks, REALTOR_SPONSOR, LENDER_SPONSOR } from "@/components/Sponsors";
 
 export const dynamicParams = true;
 export const revalidate = 86400;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const d = await getDeveloper(params.slug);
+  if (!d) return { title: "Developer Not Found" };
+  const path = `/developers/${params.slug}`;
+  const title = `${d.name} — Florida Community Association Developer`;
+  const description = `${d.name}${d.city ? ` of ${d.city}, FL` : ""} has filed ${d.projectsFiled} community ${d.projectsFiled === 1 ? "project" : "projects"} across ${d.countiesCount} Florida ${d.countiesCount === 1 ? "county" : "counties"}. Full project portfolio from Florida DBPR public records.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: absoluteUrl(path) },
+    openGraph: { title, description, url: absoluteUrl(path), type: "profile" },
+    twitter: { card: "summary", title, description },
+  };
+}
 
 export async function generateStaticParams() {
   return getDeveloperParams(1500);
@@ -19,6 +41,14 @@ export default async function DeveloperPage({ params }: { params: { slug: string
 
   return (
     <>
+      <JsonLd data={developerJsonLd({ name: d.name, city: d.city, url: `/developers/${d.slug}` })} />
+      <JsonLd
+        data={breadcrumbList([
+          { name: "Home", path: "/" },
+          { name: "Developers", path: "/developers" },
+          { name: d.name, path: `/developers/${d.slug}` },
+        ])}
+      />
       <div className="mx-auto max-w-content px-6">
         <Breadcrumbs
           items={[

@@ -1,9 +1,15 @@
+import { absoluteUrl } from "@/lib/site";
 import Link from "next/link";
 import { getAssociationsSample, slug as slugify } from "@/lib/data";
 import { Breadcrumbs, Badge } from "@/components/ui";
 import { SearchBox } from "@/components/SearchBox";
 
-export const metadata = { title: "Florida Community Associations — Directory" };
+export const metadata = {
+  title: "Florida Community Associations — Directory",
+  description:
+    "Browse 37,159 registered Florida community associations. Search by name or browse by county for registration status, managing entity, and filing facts from state public records.",
+  alternates: { canonical: absoluteUrl("/associations") },
+};
 export const revalidate = 3600;
 
 export default async function AssociationsIndex() {

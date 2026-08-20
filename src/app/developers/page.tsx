@@ -1,9 +1,15 @@
+import { absoluteUrl } from "@/lib/site";
 import Link from "next/link";
 import { getDevelopersSample } from "@/lib/data";
 import { Breadcrumbs } from "@/components/ui";
 import { SearchBox } from "@/components/SearchBox";
 
-export const metadata = { title: "Florida Community Association Developers" };
+export const metadata = {
+  title: "Florida Community Association Developers",
+  description:
+    "Browse 15,764 developers who filed community association projects with the State of Florida. See each developer's full project portfolio from state public records.",
+  alternates: { canonical: absoluteUrl("/developers") },
+};
 export const revalidate = 3600;
 
 export default async function DevelopersIndex() {

@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { track } from "@/lib/analytics";
 
 export type LeadIntent = "buying" | "owning" | "board" | "inquiry";
 export type LeadSponsor = "lender" | "realtor" | "general";
@@ -54,7 +55,14 @@ export function useLeadModal(): LeadModalContextValue {
 
 export function LeadModalProvider({ children }: { children: React.ReactNode }) {
   const [opts, setOpts] = useState<LeadOptions | null>(null);
-  const openLead = useCallback((o: LeadOptions) => setOpts(o), []);
+  const openLead = useCallback((o: LeadOptions) => {
+    track("lead_open", {
+      intent: o.intent,
+      sponsor: o.sponsor,
+      entityType: o.entityType,
+    });
+    setOpts(o);
+  }, []);
   const value = useMemo(() => ({ openLead }), [openLead]);
 
   return (
@@ -138,6 +146,12 @@ function LeadModal({ opts, onClose }: { opts: LeadOptions; onClose: () => void }
       });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.ok) throw new Error(json.error ?? "Submission failed.");
+      track("lead_submit", {
+        intent: opts.intent,
+        sponsor: opts.sponsor,
+        entityType: opts.entityType,
+        entityName: opts.entityName,
+      });
       setState("sent");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Submission failed.");

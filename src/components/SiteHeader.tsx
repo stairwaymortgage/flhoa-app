@@ -8,6 +8,7 @@ const NAV = [
   { label: "Licensed Managers", href: "/managers/cam" },
   { label: "Developers", href: "/developers" },
   { label: "Counties", href: "/counties" },
+  { label: "Resources", href: "/resources" },
   { label: "Verify a License", href: "/verify" },
 ];
 

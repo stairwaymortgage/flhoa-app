@@ -102,7 +102,12 @@ export default async function FirmPage({ params }: { params: { slug: string } })
                 { title: "I own in a community they manage", sub: "Home value report · assessment & refinancing help" },
               ]}
             />
-            <SourceNote />
+            <SourceNote
+              entityType="firm"
+              entityName={f.name}
+              entitySlug={f.slug}
+              pageUrl={`/managers/firms/${f.slug}`}
+            />
           </RecordShell>
         }
         sidebar={

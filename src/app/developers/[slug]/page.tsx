@@ -87,7 +87,12 @@ export default async function DeveloperPage({ params }: { params: { slug: string
                 { title: "I own in one", sub: "Home value report & refinancing options" },
               ]}
             />
-            <SourceNote />
+            <SourceNote
+              entityType="developer"
+              entityName={d.name}
+              entitySlug={d.slug}
+              pageUrl={`/developers/${d.slug}`}
+            />
           </RecordShell>
         }
         sidebar={

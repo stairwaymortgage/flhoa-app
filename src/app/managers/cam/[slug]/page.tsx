@@ -65,7 +65,12 @@ export default async function CamPage({ params }: { params: { slug: string } }) 
                 { title: "I'm buying or selling", sub: "Financing check & home value report for the community" },
               ]}
             />
-            <SourceNote />
+            <SourceNote
+              entityType="cam"
+              entityName={c.name}
+              entitySlug={c.slug}
+              pageUrl={`/managers/cam/${c.slug}`}
+            />
           </RecordShell>
         }
         sidebar={

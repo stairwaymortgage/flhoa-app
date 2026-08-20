@@ -99,3 +99,48 @@ export interface SearchResult {
   detail: string;
   href: string;
 }
+
+// --- Phase 6 enrichment -----------------------------------------------------
+// Registry facts only: filing status, deadlines, case numbers. No financial or
+// reserve data is stored or surfaced from any of these sources.
+
+export interface ComplianceRecord {
+  associationName: string;
+  status: string;
+  nextDeadline: string;
+  units: number | null;
+  manager: string | null;
+}
+
+export interface RecertCase {
+  caseNumber: string;
+  recertYear: string;
+  caseStatus: string;
+  enforcementStatus: string;
+}
+
+export interface RegistryRecord {
+  registrationNumber: string;
+  associationName: string;
+  associationType: string;
+  registrationStatus: string;
+  enforcementStatus: string;
+  registrationDate: string;
+}
+
+export interface GovContact {
+  office: string;
+  contact: string;
+  location: string;
+  phone: string;
+  email: string;
+}
+
+export interface CorrectionSubmission {
+  entityType: string | null;
+  entitySlug: string | null;
+  entityName: string | null;
+  pageUrl: string | null;
+  message: string;
+  submitterEmail: string | null;
+}

@@ -1,11 +1,20 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getAssociation, getAssociationParams, slug as slugify } from "@/lib/data";
+import {
+  getAssociation,
+  getAssociationParams,
+  getComplianceForAssociation,
+  getRecertsForAddress,
+  getRegistryForAssociation,
+  slug as slugify,
+} from "@/lib/data";
 import { DELINQUENT_EXPLAINER, DATA_SOURCE, AS_OF_DATE } from "@/lib/status";
 import { PageGrid } from "@/components/PageGrid";
 import { HookBar } from "@/components/HookBar";
 import { Badge, Breadcrumbs, RecordShell, FactGrid, SubSection, SourceNote } from "@/components/ui";
 import { SidebarBox, SponsorCard, ClaimBox, SidebarLinks, REALTOR_SPONSOR, LENDER_SPONSOR } from "@/components/Sponsors";
+import { ComplianceSection } from "@/components/ComplianceSection";
+import { correctionHref } from "@/lib/corrections";
 
 export const dynamicParams = true;
 export const revalidate = 86400;
@@ -19,6 +28,14 @@ export default async function AssociationPage({ params }: { params: { county: st
   if (!a) notFound();
 
   const delinquent = a.secondaryStatus === "Delinquent";
+  const pageUrl = `/associations/${params.county}/${params.slug}`;
+
+  // Enrichment sources. The Miami-Dade condominium registry only covers Dade.
+  const [compliance, recerts, registry] = await Promise.all([
+    getComplianceForAssociation(a.name),
+    getRecertsForAddress(a.street),
+    params.county === "dade" ? getRegistryForAssociation(a.name) : Promise.resolve(undefined),
+  ]);
 
   return (
     <>
@@ -74,12 +91,31 @@ export default async function AssociationPage({ params }: { params: { county: st
               </SubSection>
             )}
 
+            <ComplianceSection
+              compliance={compliance}
+              recerts={recerts}
+              registry={registry}
+              entityName={a.name}
+              entitySlug={a.slug}
+              pageUrl={pageUrl}
+            />
+
             {delinquent && (
               <SubSection title='What "Delinquent" Status Means'>
                 <p className="text-sm">{DELINQUENT_EXPLAINER}</p>
                 <p className="text-xs text-mut mt-1.5">
                   Source: DBPR registry, as of {AS_OF_DATE} ·{" "}
-                  <a href="/corrections" className="text-navy-light">Request a correction to this record</a>
+                  <Link
+                    href={correctionHref({
+                      type: "association",
+                      entity: a.name,
+                      url: pageUrl,
+                      slug: a.slug,
+                    })}
+                    className="text-navy-light"
+                  >
+                    Request a correction to this record
+                  </Link>
                 </p>
               </SubSection>
             )}
@@ -91,7 +127,14 @@ export default async function AssociationPage({ params }: { params: { county: st
                 { title: "I'm on the board", sub: "Association funding for repairs, reserves & projects" },
               ]}
             />
-            <SourceNote>Data: {DATA_SOURCE} · flhoaregistry.com is not affiliated with the State of Florida</SourceNote>
+            <SourceNote
+              entityType="association"
+              entityName={a.name}
+              entitySlug={a.slug}
+              pageUrl={pageUrl}
+            >
+              Data: {DATA_SOURCE} · flhoaregistry.com is not affiliated with the State of Florida
+            </SourceNote>
           </RecordShell>
         }
         sidebar={

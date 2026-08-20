@@ -9,6 +9,11 @@ import type {
   Developer,
   County,
   SearchResult,
+  ComplianceRecord,
+  RecertCase,
+  RegistryRecord,
+  GovContact,
+  CorrectionSubmission,
 } from "./types";
 import { decodeFirmStatus } from "./status";
 
@@ -383,6 +388,150 @@ export async function search(q: string): Promise<SearchResult[]> {
   }
 
   return results;
+}
+
+/* ------------------------------------------------- compliance & inspections */
+
+// Escape the PostgREST pattern metacharacters so a name containing % or _ cannot
+// widen the match.
+function likeLiteral(v: string): string {
+  return v.replace(/[%_\\]/g, (m) => `\\${m}`);
+}
+
+// Match key for an association name: the leading 40 characters, which is enough
+// to identify a community without requiring the suffixes ("Condo", ", Inc.")
+// to agree between two separately-maintained state datasets.
+function namePrefix(name: string): string | null {
+  const trimmed = name.trim();
+  // Too short to match on safely — a 3-character prefix would match hundreds.
+  if (trimmed.length < 5) return null;
+  return likeLiteral(trimmed.slice(0, 40));
+}
+
+// Of several prefix matches, prefer an exact (case-insensitive) name match, then
+// the shortest name — the closest thing to the association we started from.
+function bestNameMatch<T extends { association_name?: string | null }>(
+  rows: T[],
+  name: string
+): T | undefined {
+  if (rows.length === 0) return undefined;
+  const target = name.trim().toLowerCase();
+  const exact = rows.find((r) => (r.association_name ?? "").trim().toLowerCase() === target);
+  if (exact) return exact;
+  return [...rows].sort(
+    (a, b) => (a.association_name ?? "").length - (b.association_name ?? "").length
+  )[0];
+}
+
+// Milestone / structural-integrity compliance filing facts. Filed-status and
+// deadline only — this source carries no reserve or financial data by design.
+export async function getComplianceForAssociation(
+  name: string
+): Promise<ComplianceRecord | undefined> {
+  const prefix = namePrefix(name);
+  if (!prefix) return undefined;
+  const { data } = await supabase
+    .from("compliance_full")
+    .select("association_name,compliance_status,next_deadline,units,manager")
+    .ilike("association_name", `${prefix}%`)
+    .limit(5);
+  const row = bestNameMatch(data ?? [], name);
+  if (!row) return undefined;
+  return {
+    associationName: row.association_name ?? "",
+    status: row.compliance_status ?? "",
+    nextDeadline: row.next_deadline ?? "",
+    units: row.units ?? null,
+    manager: row.manager ?? null,
+  };
+}
+
+// Normalize an association street for address matching: drop unit/building
+// suffixes so "1234 Main St #101" and "1234 Main St" line up.
+function normalizeStreet(street: string): string | null {
+  const cleaned = street
+    .replace(/\s*(#|apt\.?|unit|ste\.?|suite|bldg\.?|building)\s*[\w-]*$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  // A bare street name with no number matches far too broadly to be useful.
+  if (cleaned.length < 6 || !/\d/.test(cleaned)) return null;
+  return likeLiteral(cleaned);
+}
+
+// Recertification / milestone inspection cases filed against the property.
+export async function getRecertsForAddress(street: string): Promise<RecertCase[]> {
+  const addr = normalizeStreet(street ?? "");
+  if (!addr) return [];
+  const { data } = await supabase
+    .from("recerts_full")
+    .select("case_number,recert_year,case_status,enforcement_status")
+    .ilike("property_address", `${addr}%`)
+    .order("recert_year", { ascending: false })
+    .limit(5);
+  return (data ?? []).map((r: any) => ({
+    caseNumber: r.case_number ?? "",
+    recertYear: r.recert_year ?? "",
+    caseStatus: r.case_status ?? "",
+    enforcementStatus: r.enforcement_status ?? "",
+  }));
+}
+
+// Miami-Dade condominium registry: registration + enforcement status.
+export async function getRegistryForAssociation(
+  name: string
+): Promise<RegistryRecord | undefined> {
+  const prefix = namePrefix(name);
+  if (!prefix) return undefined;
+  const { data } = await supabase
+    .from("condo_registry")
+    .select(
+      "registration_number,association_name,association_type,registration_status,enforcement_status,registration_date"
+    )
+    .ilike("association_name", `${prefix}%`)
+    .limit(5);
+  const row = bestNameMatch(data ?? [], name);
+  if (!row) return undefined;
+  return {
+    registrationNumber: row.registration_number ?? "",
+    associationName: row.association_name ?? "",
+    associationType: row.association_type ?? "",
+    registrationStatus: row.registration_status ?? "",
+    enforcementStatus: row.enforcement_status ?? "",
+    registrationDate: row.registration_date ?? "",
+  };
+}
+
+/* ------------------------------------------------------ agencies & contacts */
+
+export async function getGovContacts(limit = 100): Promise<GovContact[]> {
+  const { data } = await supabase
+    .from("gov_contacts_full")
+    .select("col1,col2,col3,col4,col5")
+    .order("id")
+    .limit(limit);
+  return (data ?? []).map((r: any) => ({
+    office: r.col1 ?? "",
+    contact: r.col2 ?? "",
+    location: r.col3 ?? "",
+    phone: r.col4 ?? "",
+    email: r.col5 ?? "",
+  }));
+}
+
+/* -------------------------------------------------------- correction requests */
+
+// Insert-only for the anon role: submissions can be written but never read back,
+// so one visitor can never see another visitor's report.
+export async function submitCorrection(sub: CorrectionSubmission): Promise<void> {
+  const { error } = await supabase.from("correction_requests").insert({
+    entity_type: sub.entityType,
+    entity_slug: sub.entitySlug,
+    entity_name: sub.entityName,
+    page_url: sub.pageUrl,
+    message: sub.message,
+    submitter_email: sub.submitterEmail,
+  });
+  if (error) throw new Error(error.message);
 }
 
 /* --------------------------------------------------------------------- helpers */

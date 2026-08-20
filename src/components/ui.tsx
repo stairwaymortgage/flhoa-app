@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DATA_SOURCE, AS_OF_DATE } from "@/lib/status";
+import { correctionHref } from "@/lib/corrections";
 
 export function Badge({
   children, tone = "info",
@@ -71,11 +72,24 @@ export function SubSection({ title, children }: { title: string; children: React
   );
 }
 
-export function SourceNote({ children }: { children?: React.ReactNode }) {
+export function SourceNote({
+  children, entityType, entityName, entitySlug, pageUrl,
+}: {
+  children?: React.ReactNode;
+  entityType?: string;
+  entityName?: string;
+  entitySlug?: string;
+  pageUrl?: string;
+}) {
+  // With a record identified, the correction form arrives prefilled.
+  const href =
+    entityType && entityName && pageUrl
+      ? correctionHref({ type: entityType, entity: entityName, url: pageUrl, slug: entitySlug })
+      : "/corrections";
   return (
     <div className="px-[26px] py-[11px] text-[11px] text-mut flex justify-between flex-wrap gap-1.5">
       <span>{children ?? `Data: ${DATA_SOURCE}`}</span>
-      <span><a href="/corrections" className="text-navy-light">Request a correction</a></span>
+      <span><Link href={href} className="text-navy-light">Request a correction</Link></span>
     </div>
   );
 }

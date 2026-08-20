@@ -30,6 +30,11 @@ export default async function DeveloperPage({ params }: { params: { slug: string
         <LeaderboardBanner
           title="Buying in a New-Construction Community?"
           sub="Compare builder financing vs. outside lenders — including foreign-national programs."
+          intent="buying"
+          sponsor="lender"
+          entityType="developer"
+          entityName={d.name}
+          entitySlug={d.slug}
         />
       </div>
 
@@ -81,10 +86,13 @@ export default async function DeveloperPage({ params }: { params: { slug: string
 
             <HookBar
               heading={`Researching a ${d.name} community?`}
+              entityType="developer"
+              entityName={d.name}
+              entitySlug={d.slug}
               hooks={[
-                { title: "I'm buying in one", sub: "Financing & approval check for any community in this portfolio" },
-                { title: "I'm buying from overseas", sub: "Foreign-national financing — no U.S. credit required" },
-                { title: "I own in one", sub: "Home value report & refinancing options" },
+                { intent: "buying", title: "I'm buying in one", sub: "Financing & approval check for any community in this portfolio" },
+                { intent: "buying", title: "I'm buying from overseas", sub: "Foreign-national financing — no U.S. credit required" },
+                { intent: "owning", title: "I own in one", sub: "Home value report & refinancing options" },
               ]}
             />
             <SourceNote
@@ -98,10 +106,10 @@ export default async function DeveloperPage({ params }: { params: { slug: string
         sidebar={
           <>
             <SidebarBox label="Featured Local Expert — New Construction · Sponsored">
-              <SponsorCard {...REALTOR_SPONSOR} />
+              <SponsorCard {...REALTOR_SPONSOR} entityType="developer" entityName={d.name} entitySlug={d.slug} />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard {...LENDER_SPONSOR} gold />
+              <SponsorCard {...LENDER_SPONSOR} gold entityType="developer" entityName={d.name} entitySlug={d.slug} />
             </SidebarBox>
             <SidebarBox label="Related Records">
               <SidebarLinks

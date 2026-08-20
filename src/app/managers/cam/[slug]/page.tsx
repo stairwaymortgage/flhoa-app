@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getCam, getCamParams } from "@/lib/data";
 import { CAM_EXPLAINER, AS_OF_DATE } from "@/lib/status";
+import { claimHref } from "@/lib/corrections";
+import Link from "next/link";
 import { PageGrid } from "@/components/PageGrid";
 import { HookBar } from "@/components/HookBar";
 import { Badge, Breadcrumbs, RecordShell, FactGrid, SubSection, SourceNote } from "@/components/ui";
@@ -59,10 +61,13 @@ export default async function CamPage({ params }: { params: { slug: string } }) 
 
             <HookBar
               heading="Working with this manager's community?"
+              entityType="cam"
+              entityName={c.name}
+              entitySlug={c.slug}
               hooks={[
-                { title: "I'm this manager", sub: "Claim your license page · CE renewal reminders · featured listing" },
-                { title: "I'm on a board", sub: "Association funding & banking options for your community" },
-                { title: "I'm buying or selling", sub: "Financing check & home value report for the community" },
+                { intent: "inquiry", title: "I'm this manager", sub: "Claim your license page · CE renewal reminders · featured listing" },
+                { intent: "board", title: "I'm on a board", sub: "Association funding & banking options for your community" },
+                { intent: "buying", title: "I'm buying or selling", sub: "Financing check & home value report for the community" },
               ]}
             />
             <SourceNote
@@ -77,14 +82,18 @@ export default async function CamPage({ params }: { params: { slug: string } }) 
           <>
             <SidebarBox label="For This Manager">
               <ClaimBox>
-                <b>Is this you?</b> <a href="/claim" className="font-bold">Claim this page</a> — add your firm, photo, and communities. Get renewal reminders before {c.expirationDate}.
+                <b>Is this you?</b>{" "}
+                <Link href={claimHref({ type: "cam", entity: c.name, slug: c.slug })} className="font-bold">
+                  Claim this page
+                </Link>{" "}
+                — add your firm, photo, and communities. Get renewal reminders before {c.expirationDate}.
               </ClaimBox>
             </SidebarBox>
             <SidebarBox label="Featured Local Expert — Sponsored">
-              <SponsorCard {...REALTOR_SPONSOR} />
+              <SponsorCard {...REALTOR_SPONSOR} entityType="cam" entityName={c.name} entitySlug={c.slug} />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard {...LENDER_SPONSOR} gold />
+              <SponsorCard {...LENDER_SPONSOR} gold entityType="cam" entityName={c.name} entitySlug={c.slug} />
             </SidebarBox>
             <SidebarBox label="Related Records">
               <SidebarLinks

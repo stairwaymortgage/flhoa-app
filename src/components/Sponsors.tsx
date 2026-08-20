@@ -1,4 +1,14 @@
 import Image from "next/image";
+import { InquireButton } from "./InquireButton";
+import type { LeadIntent, LeadSponsor } from "./LeadModal";
+
+// Entity context threaded from the record page so a lead records which
+// registry record it came from.
+export interface SponsorContext {
+  entityType?: string;
+  entityName?: string;
+  entitySlug?: string;
+}
 
 // Sponsor units. Final banner creative is designed separately; these lock in the
 // slot positions and the enforced "Sponsored" labeling.
@@ -7,6 +17,7 @@ import Image from "next/image";
 // these so the two names stay in one place. `initials` is the fallback avatar
 // used if the headshot is missing.
 export const REALTOR_SPONSOR = {
+  sponsor: "realtor" as LeadSponsor,
   initials: "OB",
   name: "Olga Blackburn, Realtor®",
   photo: "/sponsors/olga.jpeg",
@@ -18,6 +29,7 @@ export const REALTOR_SPONSOR = {
 };
 
 export const LENDER_SPONSOR = {
+  sponsor: "lender" as LeadSponsor,
   initials: "JB",
   name: "Jim Blackburn",
   photo: "/sponsors/jim.jpeg",
@@ -28,8 +40,13 @@ export const LENDER_SPONSOR = {
 };
 
 export function LeaderboardBanner({
-  title, sub,
-}: { title: string; sub: string }) {
+  title, sub, intent = "inquiry", sponsor = "general", entityType, entityName, entitySlug,
+}: {
+  title: string;
+  sub: string;
+  intent?: LeadIntent;
+  sponsor?: LeadSponsor;
+} & SponsorContext) {
   return (
     <div className="relative mt-[18px] border border-line rounded-lg bg-gradient-to-r from-navy to-navy-light text-white flex items-center justify-between gap-4 px-[22px] py-4 flex-wrap">
       <span className="absolute -top-[9px] left-3.5 bg-paper border border-line rounded-[3px] text-mut text-[9px] font-bold tracking-[0.12em] uppercase px-2 py-px">
@@ -39,14 +56,26 @@ export function LeaderboardBanner({
         <b className="font-serif text-base">{title}</b>
         <span className="block text-[13px] text-[#C8D4E0]">{sub}</span>
       </div>
-      <a href="#inquire" className="bg-gold text-navy-dark font-bold text-[13px] no-underline px-5 py-2.5 rounded-[5px] whitespace-nowrap">
-        Inquire Now
-      </a>
+      <InquireButton
+        intent={intent}
+        sponsor={sponsor}
+        entityType={entityType}
+        entityName={entityName}
+        entitySlug={entitySlug}
+        className="bg-gold text-navy-dark font-bold text-[13px] no-underline px-5 py-2.5 rounded-[5px] whitespace-nowrap"
+      />
     </div>
   );
 }
 
-export function InlineBanner({ title, sub }: { title: string; sub: string }) {
+export function InlineBanner({
+  title, sub, intent = "inquiry", sponsor = "general", entityType, entityName, entitySlug,
+}: {
+  title: string;
+  sub: string;
+  intent?: LeadIntent;
+  sponsor?: LeadSponsor;
+} & SponsorContext) {
   return (
     <div className="relative px-[26px] py-4 bg-gold-light border-b border-line flex items-center justify-between gap-3.5 flex-wrap">
       <span className="absolute top-1.5 right-2.5 text-[#9A8A4F] text-[9px] font-bold tracking-[0.12em] uppercase">
@@ -56,9 +85,14 @@ export function InlineBanner({ title, sub }: { title: string; sub: string }) {
         <b className="text-sm text-navy-dark">{title}</b>
         <span className="block text-[13px] text-mut">{sub}</span>
       </div>
-      <a href="#inquire" className="bg-navy text-white font-bold text-[13px] no-underline px-[18px] py-[9px] rounded-[5px] whitespace-nowrap">
-        Inquire Now
-      </a>
+      <InquireButton
+        intent={intent}
+        sponsor={sponsor}
+        entityType={entityType}
+        entityName={entityName}
+        entitySlug={entitySlug}
+        className="bg-navy text-white font-bold text-[13px] no-underline px-[18px] py-[9px] rounded-[5px] whitespace-nowrap"
+      />
     </div>
   );
 }
@@ -90,6 +124,7 @@ function displayUrl(url: string): string {
 
 export function SponsorCard({
   initials, name, tag, photo, specialty, license, phone, phoneNote, website, gold = false,
+  sponsor = "general", entityType, entityName, entitySlug,
 }: {
   initials?: string;
   name: string;
@@ -101,7 +136,8 @@ export function SponsorCard({
   phoneNote?: string;
   website?: string;
   gold?: boolean;
-}) {
+  sponsor?: LeadSponsor;
+} & SponsorContext) {
   const subtitle = specialty ?? tag;
   return (
     <div className="p-[15px]">
@@ -151,14 +187,16 @@ export function SponsorCard({
         </a>
       )}
 
-      <a
-        href="#inquire"
-        className={`block mt-[11px] text-center font-bold text-[13px] no-underline rounded-[5px] py-[9px] ${
+      <InquireButton
+        intent="inquiry"
+        sponsor={sponsor}
+        entityType={entityType}
+        entityName={entityName}
+        entitySlug={entitySlug}
+        className={`block w-full mt-[11px] text-center font-bold text-[13px] no-underline rounded-[5px] py-[9px] ${
           gold ? "bg-gold text-navy-dark" : "bg-navy text-white"
         }`}
-      >
-        Inquire Now
-      </a>
+      />
     </div>
   );
 }

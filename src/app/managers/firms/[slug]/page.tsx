@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getFirm, getFirmParams, slug as slugify } from "@/lib/data";
 import { isFirmActive } from "@/lib/status";
+import { claimHref } from "@/lib/corrections";
 import { PageGrid } from "@/components/PageGrid";
 import { HookBar } from "@/components/HookBar";
 import { Badge, Breadcrumbs, RecordShell, FactGrid, SubSection, SourceNote } from "@/components/ui";
@@ -33,6 +34,10 @@ export default async function FirmPage({ params }: { params: { slug: string } })
         <LeaderboardBanner
           title="Association Banking & Reserve Lending"
           sub="Repair loans, reserve funding & banking for the communities you manage."
+          sponsor="lender"
+          entityType="firm"
+          entityName={f.name}
+          entitySlug={f.slug}
         />
       </div>
 
@@ -93,13 +98,19 @@ export default async function FirmPage({ params }: { params: { slug: string } })
             <InlineBanner
               title="Insurance for Managed Communities"
               sub="Master policy reviews for HOA & condo portfolios — Florida admitted carriers."
+              entityType="firm"
+              entityName={f.name}
+              entitySlug={f.slug}
             />
 
             <HookBar
               heading="Why are you looking up this firm?"
+              entityType="firm"
+              entityName={f.name}
+              entitySlug={f.slug}
               hooks={[
-                { title: "I'm on a board vetting this firm", sub: "Management comparison guide + association funding options" },
-                { title: "I own in a community they manage", sub: "Home value report · assessment & refinancing help" },
+                { intent: "board", title: "I'm on a board vetting this firm", sub: "Management comparison guide + association funding options" },
+                { intent: "owning", title: "I own in a community they manage", sub: "Home value report · assessment & refinancing help" },
               ]}
             />
             <SourceNote
@@ -114,14 +125,18 @@ export default async function FirmPage({ params }: { params: { slug: string } })
           <>
             <SidebarBox label="For This Firm">
               <ClaimBox>
-                <b>Is this your company?</b> <a href="/claim" className="font-bold">Claim this profile</a> — add your logo, service areas & contact info. Featured placement available.
+                <b>Is this your company?</b>{" "}
+                <Link href={claimHref({ type: "firm", entity: f.name, slug: f.slug })} className="font-bold">
+                  Claim this profile
+                </Link>{" "}
+                — add your logo, service areas & contact info. Featured placement available.
               </ClaimBox>
             </SidebarBox>
             <SidebarBox label={`Featured Local Expert — ${f.county} County · Sponsored`}>
-              <SponsorCard {...REALTOR_SPONSOR} />
+              <SponsorCard {...REALTOR_SPONSOR} entityType="firm" entityName={f.name} entitySlug={f.slug} />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard {...LENDER_SPONSOR} gold />
+              <SponsorCard {...LENDER_SPONSOR} gold entityType="firm" entityName={f.name} entitySlug={f.slug} />
             </SidebarBox>
             <SidebarBox label="Related Records">
               <SidebarLinks

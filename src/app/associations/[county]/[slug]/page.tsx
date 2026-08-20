@@ -14,7 +14,7 @@ import { HookBar } from "@/components/HookBar";
 import { Badge, Breadcrumbs, RecordShell, FactGrid, SubSection, SourceNote } from "@/components/ui";
 import { SidebarBox, SponsorCard, ClaimBox, SidebarLinks, REALTOR_SPONSOR, LENDER_SPONSOR } from "@/components/Sponsors";
 import { ComplianceSection } from "@/components/ComplianceSection";
-import { correctionHref } from "@/lib/corrections";
+import { correctionHref, claimHref } from "@/lib/corrections";
 
 export const dynamicParams = true;
 export const revalidate = 86400;
@@ -121,10 +121,13 @@ export default async function AssociationPage({ params }: { params: { county: st
             )}
 
             <HookBar
+              entityType="association"
+              entityName={a.name}
+              entitySlug={a.slug}
               hooks={[
-                { title: "I'm buying here", sub: "Financing & condo-approval check before you offer" },
-                { title: "I own here", sub: "Home value report · special-assessment funding options" },
-                { title: "I'm on the board", sub: "Association funding for repairs, reserves & projects" },
+                { intent: "buying", title: "I'm buying here", sub: "Financing & condo-approval check before you offer" },
+                { intent: "owning", title: "I own here", sub: "Home value report · special-assessment funding options" },
+                { intent: "board", title: "I'm on the board", sub: "Association funding for repairs, reserves & projects" },
               ]}
             />
             <SourceNote
@@ -140,10 +143,10 @@ export default async function AssociationPage({ params }: { params: { county: st
         sidebar={
           <>
             <SidebarBox label="Featured Local Expert — Sponsored">
-              <SponsorCard {...REALTOR_SPONSOR} />
+              <SponsorCard {...REALTOR_SPONSOR} entityType="association" entityName={a.name} entitySlug={a.slug} />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard {...LENDER_SPONSOR} gold />
+              <SponsorCard {...LENDER_SPONSOR} gold entityType="association" entityName={a.name} entitySlug={a.slug} />
             </SidebarBox>
             <SidebarBox label={`In ${a.county} County`}>
               <SidebarLinks
@@ -156,7 +159,14 @@ export default async function AssociationPage({ params }: { params: { county: st
             </SidebarBox>
             <SidebarBox label="For This Association">
               <ClaimBox>
-                Are you an officer or manager of {a.name}? <a href="/claim" className="font-bold">Claim this page</a> to update details and respond to inquiries.
+                Are you an officer or manager of {a.name}?{" "}
+                <Link
+                  href={claimHref({ type: "association", entity: a.name, slug: a.slug })}
+                  className="font-bold"
+                >
+                  Claim this page
+                </Link>{" "}
+                to update details and respond to inquiries.
               </ClaimBox>
             </SidebarBox>
           </>

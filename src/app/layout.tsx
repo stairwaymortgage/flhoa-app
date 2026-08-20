@@ -3,6 +3,7 @@ import { Merriweather, Public_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { LeadModalProvider } from "@/components/LeadModal";
 
 const merriweather = Merriweather({
   subsets: ["latin"], weight: ["700", "900"], variable: "--font-merriweather", display: "swap", fallback: ["Georgia", "serif"],
@@ -24,9 +25,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${merriweather.variable} ${publicSans.variable} ${plexMono.variable}`}>
       <body className="bg-paper text-ink font-sans antialiased">
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter />
+        <LeadModalProvider>
+          <SiteHeader />
+          <main>{children}</main>
+          <SiteFooter />
+        </LeadModalProvider>
       </body>
     </html>
   );

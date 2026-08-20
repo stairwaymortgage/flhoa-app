@@ -97,10 +97,10 @@ export default async function AssociationPage({ params }: { params: { county: st
         sidebar={
           <>
             <SidebarBox label="Featured Local Expert — Sponsored">
-              <SponsorCard {...REALTOR_SPONSOR} tag={`${a.city} specialist`} />
+              <SponsorCard {...REALTOR_SPONSOR} />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard {...LENDER_SPONSOR} tag="Purchase · Refi · HELOC · Foreign National" gold />
+              <SponsorCard {...LENDER_SPONSOR} gold />
             </SidebarBox>
             <SidebarBox label={`In ${a.county} County`}>
               <SidebarLinks

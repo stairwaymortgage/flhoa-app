@@ -113,10 +113,10 @@ export default async function FirmPage({ params }: { params: { slug: string } })
               </ClaimBox>
             </SidebarBox>
             <SidebarBox label={`Featured Local Expert — ${f.county} County · Sponsored`}>
-              <SponsorCard {...REALTOR_SPONSOR} tag={`${f.county} County specialist`} />
+              <SponsorCard {...REALTOR_SPONSOR} />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard {...LENDER_SPONSOR} tag="Repair loans · HELOC · Refi" gold />
+              <SponsorCard {...LENDER_SPONSOR} gold />
             </SidebarBox>
             <SidebarBox label="Related Records">
               <SidebarLinks

@@ -76,10 +76,10 @@ export default async function CamPage({ params }: { params: { slug: string } }) 
               </ClaimBox>
             </SidebarBox>
             <SidebarBox label="Featured Local Expert — Sponsored">
-              <SponsorCard {...REALTOR_SPONSOR} tag={`${c.city} specialist`} />
+              <SponsorCard {...REALTOR_SPONSOR} />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard {...LENDER_SPONSOR} tag="Purchase · Refi · Foreign National" gold />
+              <SponsorCard {...LENDER_SPONSOR} gold />
             </SidebarBox>
             <SidebarBox label="Related Records">
               <SidebarLinks

@@ -93,10 +93,10 @@ export default async function DeveloperPage({ params }: { params: { slug: string
         sidebar={
           <>
             <SidebarBox label="Featured Local Expert — New Construction · Sponsored">
-              <SponsorCard {...REALTOR_SPONSOR} tag="New-construction & resale specialist" />
+              <SponsorCard {...REALTOR_SPONSOR} />
             </SidebarBox>
             <SidebarBox label="Financing Partner — Sponsored">
-              <SponsorCard {...LENDER_SPONSOR} tag="Conventional · Jumbo · Foreign National" gold />
+              <SponsorCard {...LENDER_SPONSOR} gold />
             </SidebarBox>
             <SidebarBox label="Related Records">
               <SidebarLinks

@@ -21,6 +21,9 @@ export const REALTOR_SPONSOR = {
   initials: "OB",
   name: "Olga Blackburn, Realtor®",
   photo: "/sponsors/olga.jpeg",
+  // Wide 4:3 frame with the subject off-centre — a centre crop lands on her
+  // torso, not her face.
+  focus: "56% 22%",
   specialty: "South Florida real estate specialist",
   license: "FL Lic. SL3569153 · The Keyes Company",
   phone: "786-225-5654",
@@ -33,6 +36,8 @@ export const LENDER_SPONSOR = {
   initials: "JB",
   name: "Jim Blackburn",
   photo: "/sponsors/jim.jpeg",
+  // Tight portrait; the head sits high in the frame.
+  focus: "50% 18%",
   specialty: "South Florida lending specialist",
   license: "NMLS #1072866 · Equal Housing Lender · Stairway Mortgage",
   phone: "(954) 993-1625",
@@ -123,13 +128,14 @@ function displayUrl(url: string): string {
 }
 
 export function SponsorCard({
-  initials, name, tag, photo, specialty, license, phone, phoneNote, website, gold = false,
+  initials, name, tag, photo, focus = "50% 50%", specialty, license, phone, phoneNote, website, gold = false,
   sponsor = "general", entityType, entityName, entitySlug,
 }: {
   initials?: string;
   name: string;
   tag?: string;
   photo?: string;
+  focus?: string;
   specialty?: string;
   license?: string;
   phone?: string;
@@ -146,14 +152,24 @@ export function SponsorCard({
           <Image
             src={photo}
             alt={name}
-            width={72}
-            height={72}
-            sizes="72px"
+            // Served at 192px for a 96px square so it stays sharp on a 2x
+            // screen. Deliberately no `sizes`: with one set, next/image drops
+            // the 1x/2x pair for a w-descriptor ladder and the browser is free
+            // to settle on a candidate barely wider than the 96px slot.
+            width={192}
+            height={192}
+            // The default 75 visibly softens a face at this size.
+            quality={90}
+            // Both sources are white-background headshots framed differently, so
+            // the square crop needs a per-person focal point, not a shared
+            // centre crop.
+            style={{ objectPosition: focus }}
             // Sidebar sponsor art is always below the fold: explicit dimensions
             // reserve the box (no CLS) while the fetch stays lazy.
             priority={false}
             loading="lazy"
-            className="w-[72px] h-[72px] rounded-lg object-cover shrink-0"
+            // The white ground would dissolve into the white card without a rule.
+            className="w-24 h-24 rounded-lg object-cover shrink-0 border border-line"
           />
         ) : (
           <span

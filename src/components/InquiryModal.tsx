@@ -277,6 +277,10 @@ function InquiryModal({ opts, onClose }: { opts: InquiryOptions; onClose: () => 
     for (const [k, v] of Object.entries(answers)) {
       qualifierAnswers[k] = v;
     }
+    // Board flow: company/association name lives in contact state, not answers
+    if (contact.company.trim()) {
+      qualifierAnswers.company = contact.company.trim();
+    }
 
     try {
       const res = await fetch("/api/lead", {

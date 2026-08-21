@@ -4,7 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { LeadModalProvider } from "@/components/LeadModal";
+import { InquiryProvider } from "@/components/InquiryModal";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { JsonLd, organizationAndWebsite } from "@/components/JsonLd";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
@@ -51,11 +51,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${merriweather.variable} ${publicSans.variable} ${plexMono.variable}`}>
       <body className="bg-paper text-ink font-sans antialiased">
         <JsonLd data={organizationAndWebsite()} />
-        <LeadModalProvider>
+        <InquiryProvider>
           <SiteHeader />
           <main>{children}</main>
           <SiteFooter />
-        </LeadModalProvider>
+        </InquiryProvider>
         <Analytics />
         <GoogleAnalytics />
       </body>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { InquireButton } from "./InquireButton";
-import type { LeadIntent, LeadSponsor } from "./LeadModal";
+import type { LeadIntent, LeadSponsor } from "./InquiryModal";
 
 // Entity context threaded from the record page so a lead records which
 // registry record it came from.

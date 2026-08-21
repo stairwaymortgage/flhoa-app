@@ -25,6 +25,10 @@ interface LeadBody {
   pageUrl?: string;
   message?: string;
   consent?: boolean;
+  /** Multi-step qualifier answers from InquiryModal. Stored as JSONB. */
+  answers?: Record<string, unknown>;
+  /** TCPA consent wording as shown. */
+  consent_text?: string;
 }
 
 function splitName(full: string): { firstName: string; lastName: string } {
@@ -41,8 +45,10 @@ async function pushToGhl(lead: LeadBody): Promise<string | null> {
   if (!apiKey || !locationId) return null;
 
   const { firstName, lastName } = splitName(lead.name ?? "");
-  const tags = ["flhoaregistry", lead.intent, lead.sponsor, lead.entityType]
-    .filter((t): t is string => Boolean(t))
+  const sourcePage = lead.pageUrl?.replace(/^\//, "") ?? "";
+  const tagParts: (string | undefined)[] = ["flhoaregistry", lead.intent, lead.sponsor, lead.entityType, sourcePage];
+  const tags = tagParts
+    .filter((t): t is string => typeof t === "string" && t.length > 0)
     .map((t) => t.toLowerCase());
 
   const controller = new AbortController();
@@ -94,12 +100,28 @@ function ghlHeaders(apiKey: string): Record<string, string> {
 
 // The inquiry detail lands as a contact note. Best-effort: the contact and the
 // Supabase row already hold the lead if this call fails.
+function answersSummary(answers: Record<string, unknown>): string {
+  const parts: string[] = [];
+  for (const [key, value] of Object.entries(answers)) {
+    if (key === "building" || value == null) continue;
+    if (typeof value === "string") parts.push(value);
+    else if (typeof value === "number") {
+      if (value >= 1_000_000) {
+        const m = value / 1_000_000;
+        parts.push("$" + (m % 1 === 0 ? m : m.toFixed(1)) + "M");
+      } else parts.push("$" + Math.round(value / 1_000) + "K");
+    } else if (Array.isArray(value) && value.length > 0) parts.push(value.join(", "));
+  }
+  return parts.join(" · ") || "(none)";
+}
+
 async function attachNote(contactId: string, lead: LeadBody, apiKey: string): Promise<void> {
   const body = [
     lead.entityName ? `Record: ${lead.entityName}` : null,
     lead.pageUrl ? `Page: ${lead.pageUrl}` : null,
     lead.intent ? `Intent: ${lead.intent}` : null,
     lead.sponsor ? `Sponsor: ${lead.sponsor}` : null,
+    lead.answers ? `Qualifier: ${answersSummary(lead.answers)}` : null,
     lead.message ? `Message: ${lead.message}` : null,
   ]
     .filter(Boolean)
@@ -166,6 +188,11 @@ export async function POST(req: NextRequest) {
   // leaves the durable Supabase row below, flagged unsynced for later retry.
   const ghlContactId = await pushToGhl(lead);
 
+  const answers =
+    body.answers && typeof body.answers === "object" && !Array.isArray(body.answers)
+      ? body.answers
+      : null;
+
   const { error } = await supabase.from("leads").insert({
     name,
     email: email || null,
@@ -178,8 +205,10 @@ export async function POST(req: NextRequest) {
     page_url: body.pageUrl ?? null,
     message: body.message ?? null,
     consent: true,
+    consent_text: body.consent_text ?? null,
     ghl_synced: Boolean(ghlContactId),
     ghl_contact_id: ghlContactId,
+    ...(answers ? { answers } : {}),
   });
 
   if (error) {

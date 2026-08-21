@@ -1,6 +1,6 @@
 "use client";
 
-import { useLeadModal, type LeadIntent } from "./LeadModal";
+import { useLeadModal, type LeadIntent } from "./InquiryModal";
 
 interface Hook {
   title: string;

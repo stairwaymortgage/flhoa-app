@@ -1,6 +1,6 @@
 "use client";
 
-import { useLeadModal, type LeadIntent, type LeadSponsor } from "./LeadModal";
+import { useLeadModal, type LeadIntent, type LeadSponsor } from "./InquiryModal";
 import { track } from "@/lib/analytics";
 
 // The "Inquire Now" control shared by every sponsor unit. Split out of

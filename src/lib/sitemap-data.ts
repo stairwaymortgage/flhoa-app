@@ -118,6 +118,11 @@ export async function fetchSegmentRows(
 // deliberately absent — they are noindex utility pages.
 export const STATIC_PATHS: { path: string; priority: number }[] = [
   { path: "/", priority: 1.0 },
+  { path: "/buyers", priority: 0.8 },
+  { path: "/preconstruction", priority: 0.8 },
+  { path: "/sellers", priority: 0.8 },
+  { path: "/foreign-buyers", priority: 0.8 },
+  { path: "/for-boards", priority: 0.8 },
   { path: "/associations", priority: 0.7 },
   { path: "/managers/firms", priority: 0.7 },
   { path: "/managers/cam", priority: 0.7 },

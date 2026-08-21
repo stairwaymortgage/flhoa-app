@@ -21,9 +21,9 @@ export const REALTOR_SPONSOR = {
   initials: "OB",
   name: "Olga Blackburn, Realtor®",
   photo: "/sponsors/olga.jpeg",
-  // Wide 4:3 frame with the subject off-centre — a centre crop lands on her
-  // torso, not her face.
-  focus: "56% 22%",
+  // Source is pre-cropped square (see the note on `focus` below), so the
+  // square slot needs no pan.
+  focus: "50% 50%",
   specialty: "South Florida real estate specialist",
   license: "FL Lic. SL3569153 · The Keyes Company",
   phone: "786-225-5654",
@@ -160,9 +160,14 @@ export function SponsorCard({
             height={192}
             // The default 75 visibly softens a face at this size.
             quality={90}
-            // Both sources are white-background headshots framed differently, so
-            // the square crop needs a per-person focal point, not a shared
-            // centre crop.
+            // Only useful where the source is off-square: Jim's is a 422x500
+            // portrait, so the square slot has vertical overflow to pan through.
+            // It does nothing for a source that is already square, and it could
+            // do nothing for Olga's original 1600x1200 either — a landscape
+            // source in a square slot overflows horizontally only, so every
+            // vertical value showed the same full head-to-waist height with her
+            // face shrunk into the top third. That one is now cropped to a
+            // 780x780 head-and-shoulders frame in the file instead.
             style={{ objectPosition: focus }}
             // Sidebar sponsor art is always below the fold: explicit dimensions
             // reserve the box (no CLS) while the fetch stays lazy.

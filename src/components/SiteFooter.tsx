@@ -19,6 +19,7 @@ const DIRECTORY_LINKS = [
 const RESOURCE_LINKS = [
   { label: "Counties", href: "/counties" },
   { label: "Resources", href: "/resources" },
+  { label: "Guides", href: "/blog" },
   { label: "Verify a License", href: "/verify" },
   { label: "Corrections", href: "/corrections" },
 ];

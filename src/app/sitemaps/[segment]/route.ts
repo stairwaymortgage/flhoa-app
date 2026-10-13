@@ -1,5 +1,6 @@
 import { absoluteUrl } from "@/lib/site";
 import { fetchSegmentRows, findEntity, STATIC_PATHS } from "@/lib/sitemap-data";
+import { getAllPosts } from "@/lib/blog";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -40,16 +41,17 @@ export async function GET(_req: Request, { params }: { params: { segment: string
   const lastmod = new Date().toISOString();
 
   if (name === "static") {
-    return xml(
-      renderUrlset(
-        STATIC_PATHS.map((s) => ({
-          loc: absoluteUrl(s.path),
-          priority: s.priority,
-          changefreq: s.path === "/" ? "daily" : "weekly",
-        })),
-        lastmod
-      )
-    );
+    const staticEntries: UrlEntry[] = STATIC_PATHS.map((s) => ({
+      loc: absoluteUrl(s.path),
+      priority: s.priority,
+      changefreq: s.path === "/" ? "daily" : "weekly",
+    }));
+    const postEntries: UrlEntry[] = getAllPosts().map((p) => ({
+      loc: absoluteUrl(`/blog/${p.slug}`),
+      priority: 0.6,
+      changefreq: "monthly",
+    }));
+    return xml(renderUrlset([...staticEntries, ...postEntries], lastmod));
   }
 
   const match = name.match(/^(.*)-(\d+)$/);

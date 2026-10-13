@@ -129,5 +129,6 @@ export const STATIC_PATHS: { path: string; priority: number }[] = [
   { path: "/developers", priority: 0.7 },
   { path: "/counties", priority: 0.7 },
   { path: "/resources", priority: 0.7 },
+  { path: "/blog", priority: 0.7 },
   { path: "/verify", priority: 0.7 },
 ];

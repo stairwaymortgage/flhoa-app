@@ -158,6 +158,10 @@ export function SiteHeader() {
           <Link href="/verify" className={linkClass("/verify")}>
             Verify a License
           </Link>
+
+          <Link href="/blog" className={linkClass("/blog")}>
+            Guides
+          </Link>
         </div>
       </nav>
 
@@ -200,6 +204,13 @@ export function SiteHeader() {
               onClick={() => setMobileOpen(false)}
             >
               Verify a License
+            </Link>
+            <Link
+              href="/blog"
+              className="block py-3 px-3 text-sm font-semibold text-navy no-underline hover:bg-paper"
+              onClick={() => setMobileOpen(false)}
+            >
+              Guides
             </Link>
           </div>
         </nav>
